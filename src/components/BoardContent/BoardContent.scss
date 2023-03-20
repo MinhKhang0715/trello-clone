@@ -1,0 +1,23 @@
+$column-header-height: 36px;
+$column-footer-height: 36px;
+$column-border-radius: 5px;
+$card-border-radius: 4px;
+
+.board-content {
+  display: flex;
+  margin: 0 10px 10px;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-scrollbar:horizontal {
+    height: 11px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .24);
+    border-radius: 8px;
+  }
+}
