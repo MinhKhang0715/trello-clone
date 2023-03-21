@@ -1,4 +1,7 @@
+@import '../../global-css';
+
 .navbar-board {
+  height: $navbar-board-height;
   background-color: #0079bf;
   font-size: 1.1rem;
   padding-left: 10px;

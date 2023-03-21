@@ -1,12 +1,16 @@
+@import '../../global-css';
+
 $column-header-height: 36px;
 $column-footer-height: 36px;
 $column-border-radius: 5px;
 $card-border-radius: 4px;
 
 .board-content {
-  display: flex;
-  margin: 0 10px 10px;
+  height: $board-content-height;
+  // display: flex;
+  // margin: 0 10px 10px;
   overflow-x: auto;
+  overflow-y: hidden;
 
   &::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -19,5 +23,11 @@ $card-border-radius: 4px;
   &::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, .24);
     border-radius: 8px;
+  }
+
+  .column-drop-preview {
+    background-color: rgba(150, 150, 200, 0.1);
+    border: 1px dashed #abc;
+    margin: 5px 45px 5px 5px;
   }
 }

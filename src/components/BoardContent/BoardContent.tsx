@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Container, Draggable, DropResult } from "react-smooth-dnd";
+
 import './BoardContent.scss';
 import Column from "../Column/Column";
 import { initialData } from "../../actions/initialData";
@@ -33,9 +35,28 @@ function BoardContent() {
     return <div className="not-found">Board not found</div>
   }
 
+  const onColumnDrop = (dragResult: DropResult) => {
+    console.log(dragResult);
+  }
+
   return (
     <div className="board-content">
-      {columns.map((column, index) => <Column key={index} {...column} />)}
+      <Container
+        orientation="horizontal"
+        dragHandleSelector=".column-drag-handle"
+        onDrop={onColumnDrop}
+        getChildPayload={index => columns[index]}
+        dropPlaceholder={{
+          animationDuration: 150,
+          showOnTop: true,
+          className: 'column-drop-preview'
+        }}>
+        {columns.map((column, index) => (
+          <Draggable key={index}>
+            <Column {...column} />
+          </Draggable>
+        ))}
+      </Container>
     </div>
   );
 }
