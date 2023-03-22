@@ -1,7 +1,7 @@
 @import '../../global-css';
 
-$column-header-height: 36px;
-$column-footer-height: 36px;
+$column-header-height: 46px;
+$column-footer-height: 46px;
 $column-border-radius: 5px;
 $column-height: calc(#{$board-content-height} - 20px);
 
@@ -13,7 +13,6 @@ $column-height: calc(#{$board-content-height} - 20px);
 
   > * {
     background-color: #ebecf0;
-    color: #333;
     padding: 0 8px;
   }
 
@@ -34,6 +33,14 @@ $column-height: calc(#{$board-content-height} - 20px);
     line-height: $column-footer-height;
     border-bottom-left-radius: $column-border-radius;
     border-bottom-right-radius: $column-border-radius;
+    color: #888;
+    .footer-actions {
+      margin-left: 10px;
+      cursor: pointer;
+      &:hover {
+        color: #333;
+      }
+    }
   }
 
   .card-list {
@@ -49,12 +56,14 @@ $column-height: calc(#{$board-content-height} - 20px);
 
     .card-ghost {
       transition: transform 0.18s ease;
-      transform: rotateZ(5deg)
+      transform: rotateZ(5deg);
+      font-weight: bold;
     }
 
     .card-ghost-drop {
       transition: transform 0.18s ease-in-out;
-      transform: rotateZ(0deg)
+      transform: rotateZ(0deg);
+      font-weight: bold;
     }
   }
 }

@@ -4,15 +4,16 @@ import './Column.scss'
 import Card from "../Card/Card";
 import { TrelloColumn } from "../../actions/interfaces";
 
-function Column(props: TrelloColumn) {
-  const column = props;
+interface ComponentProps {
+  column: TrelloColumn;
+  onCardDrop(columnId: string, dropResult: DropResult): void;
+}
+
+function Column(props: ComponentProps) {
+  const { column, onCardDrop } = props;
   const cards = column.cards.sort(function (a, b) {
     return column.cardOrder.indexOf(a.id) - column.cardOrder.indexOf(b.id);
   });
-
-  const onCardDrop = (dropResult: DropResult) => {
-    console.log(dropResult);
-  }
 
   return (
     <div className="column">
@@ -20,7 +21,7 @@ function Column(props: TrelloColumn) {
       <div className="card-list">
         <Container
           groupName="trello-columns"
-          onDrop={onCardDrop}
+          onDrop={dropResult => onCardDrop(column.id, dropResult)}
           getChildPayload={index => cards[index]}
           dragClass="card-ghost"
           dropClass="card-ghost-drop"
@@ -37,7 +38,11 @@ function Column(props: TrelloColumn) {
           ))}
         </Container>
       </div>
-      <footer>Add another card</footer>
+      <footer>
+        <div className="footer-actions">
+          <i className="fa fa-plus icon" /> Add another card
+        </div>
+      </footer>
     </div>
   );
 }
