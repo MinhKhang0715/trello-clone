@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Draggable, DropResult } from "react-smooth-dnd";
+import {
+  Container as BootstrapContainer,
+  Row, Col, Form, Button
+} from "react-bootstrap";
 
 import './BoardContent.scss';
 import Column from "../Column/Column";
@@ -22,6 +26,10 @@ function BoardContent() {
     columns: []
   });
   const [columns, setColumns] = useState<TrelloColumn[]>([]);
+  const [newColumnForm, setNewColumnForm] = useState(false);
+  const newColumnInputRef = useRef<HTMLInputElement>(null);
+  const [newColumnTitle, setNewColumnTitle] = useState('');
+  const onNewColumnTitleChanged = useCallback((element) => setNewColumnTitle(element.target.value), []);
 
   useEffect(() => {
     const boardFromDB = initialData.boards.find(board => board.id === 'board-1');
@@ -36,17 +44,28 @@ function BoardContent() {
     }
   }, [])
 
+  useEffect(() => {
+    if (newColumnInputRef && newColumnInputRef.current) {
+      newColumnInputRef.current.focus();
+      newColumnInputRef.current.select();
+    }
+  }, [newColumnForm])
+
   if (isObjectEmty(board)) {
     return <div className="not-found">Board not found</div>
   }
 
-  const onColumnDrop = (drogResult: DropResult) => {
-    let newColumns = applyDrag([...columns], drogResult);
+  const updateBoard = (newColumns: TrelloColumn[]) => {
     let newBoard = { ...board };
     newBoard.columnOrder = newColumns.map(col => col.id);
     newBoard.columns = newColumns;
     setColumns(newColumns);
     setBoard(newBoard);
+  }
+
+  const onColumnDrop = (drogResult: DropResult) => {
+    let newColumns = applyDrag([...columns], drogResult);
+    updateBoard(newColumns);
   }
 
   const onCardDrop = (columnId: string, dropResult: DropResult) => {
@@ -59,6 +78,28 @@ function BoardContent() {
       currentColumn.cardOrder = currentColumn.cards.map(card => card.id);
       setColumns(newColumns);
     }
+  }
+
+  const toggleOpenNewColumnForm = () => setNewColumnForm(!newColumnForm);
+
+  const addNewColumn = () => {
+    if (!newColumnTitle) {
+      newColumnInputRef.current?.focus();
+      return;
+    }
+
+    const newColumnToAdd: TrelloColumn = {
+      id: Math.random().toString(36).substring(2, 5),
+      boardId: board.id,
+      title: newColumnTitle.trim(),
+      cardOrder: [],
+      cards: []
+    }
+    let newColumns = [...columns];
+    newColumns.push(newColumnToAdd);
+    updateBoard(newColumns);
+    setNewColumnTitle('');
+    toggleOpenNewColumnForm();
   }
 
   return (
@@ -79,9 +120,35 @@ function BoardContent() {
           </Draggable>
         ))}
       </Container>
-      <div className="add-new-column">
-        <i className="fa fa-plus icon" /> Add another list
-      </div>
+
+      <BootstrapContainer className="trello-container">
+        {newColumnForm ?
+          <Row>
+            <Col className="input-new-column">
+              <Form.Control
+                size="sm"
+                type="text"
+                placeholder="Enter column title..."
+                className="input-form-new-column"
+                ref={newColumnInputRef}
+                value={newColumnTitle}
+                onChange={onNewColumnTitleChanged}
+                onKeyDown={event => (event.key === 'Enter') && addNewColumn()}
+              />
+              <Button variant="success" size="sm" onClick={addNewColumn}>Add list</Button>
+              <span className="cancel-new-column" onClick={toggleOpenNewColumnForm}>
+                <i className="fa fa-trash icon"></i>
+              </span>
+            </Col>
+          </Row>
+          :
+          <Row>
+            <Col className="add-new-column" onClick={toggleOpenNewColumnForm}>
+              <i className="fa fa-plus icon" /> Add another list
+            </Col>
+          </Row>
+        }
+      </BootstrapContainer>
     </div>
   );
 }
