@@ -4,7 +4,8 @@ import { Container, Draggable, DropResult } from "react-smooth-dnd";
 import './BoardContent.scss';
 import Column from "../Column/Column";
 import { initialData } from "../../actions/initialData";
-import { TrelloColumn } from "../../actions/interfaces";
+import { Board, TrelloColumn } from "../../actions/interfaces";
+import { applyDrag } from "../../helpers/dragDrop";
 
 const isObjectEmty = (object: any) => {
   return (
@@ -15,7 +16,11 @@ const isObjectEmty = (object: any) => {
 };
 
 function BoardContent() {
-  const [board, setBoard] = useState({});
+  const [board, setBoard] = useState<Board>({
+    id: "",
+    columnOrder: [],
+    columns: []
+  });
   const [columns, setColumns] = useState<TrelloColumn[]>([]);
 
   useEffect(() => {
@@ -35,8 +40,25 @@ function BoardContent() {
     return <div className="not-found">Board not found</div>
   }
 
-  const onColumnDrop = (dragResult: DropResult) => {
-    console.log(dragResult);
+  const onColumnDrop = (drogResult: DropResult) => {
+    let newColumns = applyDrag([...columns], drogResult);
+    let newBoard = { ...board };
+    newBoard.columnOrder = newColumns.map(col => col.id);
+    newBoard.columns = newColumns;
+    setColumns(newColumns);
+    setBoard(newBoard);
+  }
+
+  const onCardDrop = (columnId: string, dropResult: DropResult) => {
+    if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
+      let newColumns = [...columns];
+      // exclamation point to explicitly say the result of Array.find()
+      // in this case never return undefined
+      let currentColumn = newColumns.find(col => col.id === columnId)!;
+      currentColumn.cards = applyDrag(currentColumn.cards, dropResult);
+      currentColumn.cardOrder = currentColumn.cards.map(card => card.id);
+      setColumns(newColumns);
+    }
   }
 
   return (
@@ -53,10 +75,13 @@ function BoardContent() {
         }}>
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column {...column} />
+            <Column column={column} onCardDrop={onCardDrop} />
           </Draggable>
         ))}
       </Container>
+      <div className="add-new-column">
+        <i className="fa fa-plus icon" /> Add another list
+      </div>
     </div>
   );
 }

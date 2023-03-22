@@ -1,13 +1,8 @@
 @import '../../global-css';
 
-$column-header-height: 36px;
-$column-footer-height: 36px;
-$column-border-radius: 5px;
-$card-border-radius: 4px;
-
 .board-content {
   height: $board-content-height;
-  // display: flex;
+  display: flex;
   // margin: 0 10px 10px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -29,5 +24,21 @@ $card-border-radius: 4px;
     background-color: rgba(150, 150, 200, 0.1);
     border: 1px dashed #abc;
     margin: 5px 45px 5px 5px;
+  }
+
+  .add-new-column {
+    width: 250px;
+    height: 32px;
+    line-height: 32px;
+    padding: 4px 0 4px 15px;
+    cursor: pointer;
+    color: white;
+    margin-left: 10px;
+    font-size: 15px;
+    background-color: hsla(0, 0%, 100%, .24);
+    border-radius: 5px;
+    &:hover {
+      background-color: hsla(0, 0%, 100%, .34);
+    }
   }
 }
