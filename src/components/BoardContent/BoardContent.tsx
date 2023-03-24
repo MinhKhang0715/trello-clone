@@ -19,7 +19,7 @@ const isObjectEmty = (object: any) => {
   );
 };
 
-function BoardContent() {
+export default function BoardContent() {
   const [board, setBoard] = useState<Board>({
     id: "",
     columnOrder: [],
@@ -102,6 +102,16 @@ function BoardContent() {
     toggleOpenNewColumnForm();
   }
 
+  const onUpdateColumn = (newColumnToUpdate: TrelloColumn) => {
+    let newColumns = [...columns];
+    const indexOfColumnToUpdate = newColumns.findIndex(col => col.id === newColumnToUpdate.id);
+    newColumnToUpdate._destroyed ?
+      newColumns.splice(indexOfColumnToUpdate, 1) :
+      newColumns.splice(indexOfColumnToUpdate, 1, newColumnToUpdate);
+
+    updateBoard(newColumns);
+  }
+
   return (
     <div className="board-content">
       <Container
@@ -116,7 +126,7 @@ function BoardContent() {
         }}>
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column column={column} onCardDrop={onCardDrop} />
+            <Column column={column} onCardDrop={onCardDrop} onUpdateColumn={onUpdateColumn} />
           </Draggable>
         ))}
       </Container>
@@ -153,5 +163,5 @@ function BoardContent() {
   );
 }
 
-export default BoardContent;
+
 

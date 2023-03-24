@@ -11,20 +11,68 @@ $column-height: calc(#{$board-content-height} - 20px);
   height: $column-height;
   margin-left: 10px;
 
-  > * {
+  >* {
     background-color: $column-bg-color;
     padding: 0 8px;
   }
 
   header.column-drag-handle {
     cursor: pointer;
-    padding-left: 15px;
+    display: flex;
+    padding: 5px 8px;
     height: $column-header-height;
     line-height: $column-header-height;
     font-size: 16px;
     font-weight: bold;
     border-top-left-radius: $column-border-radius;
     border-top-right-radius: $column-border-radius;
+
+    .column-title {
+      flex: 90%;
+    }
+
+    .column-dropdown {
+      flex: 10%;
+
+      .dropdown {
+        .dropdown-btn {
+          padding: 0 10px;
+          font-size: 16px;
+          font-weight: bold;
+          height: 32px;
+          margin-top: -15px;
+          color: #333;
+          border-color: $column-bg-color;
+          letter-spacing: 1px;
+          background-color: $column-bg-color;
+
+          &::after {
+            content: '...';
+            border: none;
+          }
+
+          &:hover {
+            background-color: darken($color: $column-bg-color, $amount: 10);
+            border-color: darken($color: $column-bg-color, $amount: 10);
+          }
+        }
+      }
+
+      .dropdown-menu {
+        padding: 0;
+        min-width: 200px;
+
+        a.dropdown-item {
+          padding: 0.1rem 1rem;
+          font-size: 14px;
+
+          &:not(:last-child) {
+            border-bottom: 1px solid darken($color: $column-bg-color, $amount: 10);
+          }
+        }
+      }
+    }
+
   }
 
   footer {
@@ -34,9 +82,11 @@ $column-height: calc(#{$board-content-height} - 20px);
     border-bottom-left-radius: $column-border-radius;
     border-bottom-right-radius: $column-border-radius;
     color: #888;
+
     .footer-actions {
       margin-left: 5px;
       cursor: pointer;
+
       &:hover {
         color: #333;
       }

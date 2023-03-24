@@ -27,6 +27,18 @@ body {
     padding: 0;
   }
 
+  .trello-content-editable {
+    background-color: inherit;
+    border: none;
+    font-size: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+    &:focus {
+      background-color: white;
+      border: 1px solid $input-border-color;
+    }
+  }
+
   textarea:focus,
   textarea.form-control:focus,
   input.form-control:focus,
