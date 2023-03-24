@@ -11,7 +11,8 @@ export interface TrelloColumn {
     boardId: string,
     title: string,
     cardOrder: string[],
-    cards: TrelloCard[]
+    cards: TrelloCard[],
+    _destroyed?: boolean
 }
 
 export interface Board {
