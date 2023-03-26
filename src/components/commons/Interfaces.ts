@@ -20,3 +20,5 @@ export interface Board {
     columnOrder: string[],
     columns: TrelloColumn[]
 }
+
+export type FormControlElement = HTMLInputElement | HTMLTextAreaElement;
