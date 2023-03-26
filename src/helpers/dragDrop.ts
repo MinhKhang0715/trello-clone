@@ -1,5 +1,5 @@
 import { DropResult } from "react-smooth-dnd";
-import { TrelloColumn, TrelloCard } from '../actions/interfaces'
+import { TrelloColumn, TrelloCard } from '../components/commons/Interfaces'
 
 export const applyDrag = (arr: TrelloColumn[] | TrelloCard[], dragResult: DropResult): any[] => {
   const { removedIndex, addedIndex, payload } = dragResult;

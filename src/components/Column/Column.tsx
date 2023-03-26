@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './Column.scss'
 import { Container, Draggable, DropResult } from "react-smooth-dnd";
-import { Dropdown, Form } from "react-bootstrap";
+import { Dropdown, Form, Button } from "react-bootstrap";
 
 import Card from "../Card/Card";
 import ConfirmModal from "../commons/ConfirmModal";
-import { TrelloColumn } from "../../actions/interfaces";
+import { TrelloColumn, FormControlElement, TrelloCard } from "../commons/Interfaces";
 import { /*MODAL_ACTION_CLOSE,*/ MODAL_ACTION_CONFIRM } from "../../helpers/constants";
 import { saveContentAfterEnter, selectAllInlineText } from "../../helpers/contentEditable";
 
@@ -16,18 +16,31 @@ interface ComponentProps {
 }
 
 export default function Column(props: ComponentProps) {
-  const { column, onCardDrop, onUpdateColumn } = props;
+  const { column, onCardDrop, onUpdateColumn  } = props;
   const cards = column.cards.sort(function (a, b) {
     return column.cardOrder.indexOf(a.id) - column.cardOrder.indexOf(b.id);
   });
   const [showModal, setShowModal] = useState(false);
   const [columnTitle, setColumnTitle] = useState('');
+  const [newCardArea, setNewCardArea] = useState(false);
+  const [newCardTitle, setNewCardTitle] = useState('');
+  const newCardTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleColumnTitleChanged = useCallback((e) => setColumnTitle(e.target.value), []);
+  const toggleOpenNewCardArea = () => setNewCardArea(!newCardArea);
+
+  const handleColumnTitleChanged = (e: React.ChangeEvent<FormControlElement>) => setColumnTitle(e.target.value);
+
+  const onNewCardTitleChanged = (e: React.ChangeEvent<FormControlElement>) => setNewCardTitle(e.target.value);
 
   useEffect(() => {
     setColumnTitle(column.title);
   }, [column.title]);
+
+  useEffect(() => {
+    if (newCardTextAreaRef && newCardTextAreaRef.current) {
+      newCardTextAreaRef.current.focus();
+    }
+  }, [newCardArea]);
 
   const toggleShowModal = () => setShowModal(!showModal);
 
@@ -49,6 +62,28 @@ export default function Column(props: ComponentProps) {
       title: columnTitle
     };
     onUpdateColumn(newColumn);
+  }
+
+  const addNewCard = () => {
+    if (!newCardTitle) {
+      newCardTextAreaRef.current?.focus();
+      return;
+    }
+
+    const newCardToAdd: TrelloCard = {
+      id: Math.random().toString(36).substring(2, 5),
+      boardId: column.boardId,
+      columnId: column.id,
+      title: newCardTitle.trim(),
+      cover: null
+    };
+    // don't use spread operator because it will modify the original
+    let newColumn = JSON.parse(JSON.stringify(column));
+    newColumn.cards.push(newCardToAdd);
+    newColumn.cardOrder.push(newCardToAdd.id);
+    onUpdateColumn(newColumn);
+    setNewCardTitle('');
+    toggleOpenNewCardArea();
   }
 
   return (
@@ -98,11 +133,36 @@ export default function Column(props: ComponentProps) {
             </Draggable>
           ))}
         </Container>
+        {newCardArea &&
+          <div className="add-new-card-area">
+            <Form.Control
+              size="sm"
+              as="textarea"
+              rows={3}
+              placeholder="Enter card title..."
+              className="textarea-new-card"
+              ref={newCardTextAreaRef}
+              value={newCardTitle}
+              onChange={onNewCardTitleChanged}
+              onKeyDown={event => (event.key === 'Enter') && addNewCard()}
+            />
+          </div>
+        }
       </div>
       <footer>
-        <div className="footer-actions">
-          <i className="fa fa-plus icon" /> Add another card
-        </div>
+        {newCardArea &&
+          <div>
+            <Button variant="success" size="sm" onClick={addNewCard}>Add card</Button>
+            <span className="cancel-icon" onClick={toggleOpenNewCardArea}>
+              <i className="fa fa-trash icon"></i>
+            </span>
+          </div>
+        }
+        {!newCardArea &&
+          <div className="footer-actions" onClick={toggleOpenNewCardArea}>
+            <i className="fa fa-plus icon" /> Add another card
+          </div>
+        }
       </footer>
 
       <ConfirmModal

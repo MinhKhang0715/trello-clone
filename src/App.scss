@@ -19,7 +19,7 @@ body {
 
   .icon {
     font-size: 14px;
-    margin:0 3px;
+    margin: 0 3px;
   }
 
   .trello-container {
@@ -33,9 +33,9 @@ body {
     font-size: inherit;
     font-weight: inherit;
     cursor: pointer;
+
     &:focus {
       background-color: white;
-      border: 1px solid $input-border-color;
     }
   }
 
@@ -51,6 +51,21 @@ body {
   [type=email].form-control:focus,
   [type=tel].form-control:focus,
   [contenteditable].form-control:focus {
-    box-shadow: inset 0 -1px 0 #ddd;
+    box-shadow: none;
+    border: 1px solid $input-border-color;
+  }
+
+  span.cancel-icon {
+    margin-left: 10px;
+    cursor: pointer;
+
+    i {
+      font-size: 24px;
+      color: #ee5253;
+
+      &:hover {
+        color: darken($color: #ee5253, $amount: 10);
+      }
+    }
   }
 }

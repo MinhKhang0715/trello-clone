@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Container, Draggable, DropResult } from "react-smooth-dnd";
 import {
   Container as BootstrapContainer,
@@ -8,7 +8,7 @@ import {
 import './BoardContent.scss';
 import Column from "../Column/Column";
 import { initialData } from "../../actions/initialData";
-import { Board, TrelloColumn } from "../../actions/interfaces";
+import { Board, TrelloColumn, FormControlElement } from "../commons/Interfaces";
 import { applyDrag } from "../../helpers/dragDrop";
 
 const isObjectEmty = (object: any) => {
@@ -29,7 +29,7 @@ export default function BoardContent() {
   const [newColumnForm, setNewColumnForm] = useState(false);
   const newColumnInputRef = useRef<HTMLInputElement>(null);
   const [newColumnTitle, setNewColumnTitle] = useState('');
-  const onNewColumnTitleChanged = useCallback((element) => setNewColumnTitle(element.target.value), []);
+  const onNewColumnTitleChanged = (element: React.ChangeEvent<FormControlElement>) => { setNewColumnTitle(element.target.value)/*; console.log(element);*/ };
 
   useEffect(() => {
     const boardFromDB = initialData.boards.find(board => board.id === 'board-1');
@@ -126,7 +126,11 @@ export default function BoardContent() {
         }}>
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column column={column} onCardDrop={onCardDrop} onUpdateColumn={onUpdateColumn} />
+            <Column
+              column={column}
+              onCardDrop={onCardDrop}
+              onUpdateColumn={onUpdateColumn}
+            />
           </Draggable>
         ))}
       </Container>
@@ -146,7 +150,7 @@ export default function BoardContent() {
                 onKeyDown={event => (event.key === 'Enter') && addNewColumn()}
               />
               <Button variant="success" size="sm" onClick={addNewColumn}>Add list</Button>
-              <span className="cancel-new-column" onClick={toggleOpenNewColumnForm}>
+              <span className="cancel-icon" onClick={toggleOpenNewColumnForm}>
                 <i className="fa fa-trash icon"></i>
               </span>
             </Col>
@@ -162,6 +166,3 @@ export default function BoardContent() {
     </div>
   );
 }
-
-
-

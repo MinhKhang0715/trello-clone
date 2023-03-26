@@ -115,5 +115,12 @@ $column-height: calc(#{$board-content-height} - 20px);
       transform: rotateZ(0deg);
       font-weight: bold;
     }
+
+    .add-new-card-area {
+      .textarea-new-card {
+        min-height: 54px;
+        max-height: 162px;
+      }
+    }
   }
 }

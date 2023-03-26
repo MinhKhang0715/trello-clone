@@ -58,21 +58,6 @@
     border-radius: 5px;
     input.input-form-new-column {
       margin: 5px 0;
-      &:focus {
-        border-color: $input-border-color;
-      }
-    }
-
-    span.cancel-new-column {
-      margin-left: 10px;
-      cursor: pointer;
-      i {
-        font-size: 24px;
-        color: #ee5253;
-        &:hover{
-          color: darken($color: #ee5253, $amount: 10);
-        }
-      }
     }
   }
 }

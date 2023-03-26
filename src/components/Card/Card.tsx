@@ -1,6 +1,6 @@
 import React from "react";
 import './Card.scss'
-import { TrelloCard } from "../../actions/interfaces";
+import { TrelloCard } from "../commons/Interfaces";
 
 function Card(props: TrelloCard) {
   const card = props;
