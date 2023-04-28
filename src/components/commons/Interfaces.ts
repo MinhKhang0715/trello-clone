@@ -1,24 +1,27 @@
-export interface TrelloCard {
-    id: string,
-    boardId: string,
-    columnId: string,
-    title: string,
-    cover: string | null
-};
-
-export interface TrelloColumn {
-    id: string,
-    boardId: string,
-    title: string,
-    cardOrder: string[],
-    cards: TrelloCard[],
-    _destroyed?: boolean
+interface Base {
+  _id: string,
+  title: string,
+  createdAt?: Date,
+  updatedAt?: Date | null,
+  _destroy?: boolean
 }
 
-export interface Board {
-    id: string,
-    columnOrder: string[],
-    columns: TrelloColumn[]
+export interface TrelloCard extends Base {
+  boardId: string,
+  columnId: string,
+  cover: string | null
+}
+
+export interface TrelloColumn extends Base {
+  boardId: string,
+  cardOrder: string[]
+  cards: TrelloCard[]
+}
+
+export interface Board extends Base {
+  columnOrder: string[],
+  columns: TrelloColumn[],
+  cards?: TrelloCard[]
 }
 
 export type FormControlElement = HTMLInputElement | HTMLTextAreaElement;

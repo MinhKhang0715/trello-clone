@@ -18,7 +18,7 @@ interface ComponentProps {
 export default function Column(props: ComponentProps) {
   const { column, onCardDrop, onUpdateColumn  } = props;
   const cards = column.cards.sort(function (a, b) {
-    return column.cardOrder.indexOf(a.id) - column.cardOrder.indexOf(b.id);
+    return column.cardOrder.indexOf(a._id) - column.cardOrder.indexOf(b._id);
   });
   const [showModal, setShowModal] = useState(false);
   const [columnTitle, setColumnTitle] = useState('');
@@ -71,16 +71,16 @@ export default function Column(props: ComponentProps) {
     }
 
     const newCardToAdd: TrelloCard = {
-      id: Math.random().toString(36).substring(2, 5),
+      _id: Math.random().toString(36).substring(2, 5),
       boardId: column.boardId,
-      columnId: column.id,
+      columnId: column._id,
       title: newCardTitle.trim(),
       cover: null
     };
     // don't use spread operator because it will modify the original
     let newColumn = JSON.parse(JSON.stringify(column));
     newColumn.cards.push(newCardToAdd);
-    newColumn.cardOrder.push(newCardToAdd.id);
+    newColumn.cardOrder.push(newCardToAdd._id);
     onUpdateColumn(newColumn);
     setNewCardTitle('');
     toggleOpenNewCardArea();
@@ -117,7 +117,7 @@ export default function Column(props: ComponentProps) {
       <div className="card-list">
         <Container
           groupName="trello-columns"
-          onDrop={dropResult => onCardDrop(column.id, dropResult)}
+          onDrop={dropResult => onCardDrop(column._id, dropResult)}
           getChildPayload={index => cards[index]}
           dragClass="card-ghost"
           dropClass="card-ghost-drop"

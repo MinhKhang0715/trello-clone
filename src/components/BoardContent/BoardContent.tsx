@@ -7,9 +7,9 @@ import {
 
 import './BoardContent.scss';
 import Column from "../Column/Column";
-import { initialData } from "../../actions/initialData";
 import { Board, TrelloColumn, FormControlElement } from "../commons/Interfaces";
 import { applyDrag } from "../../helpers/dragDrop";
+import { fetchBoard } from "../../actions/ApiCall";
 
 const isObjectEmty = (object: any) => {
   return (
@@ -21,9 +21,10 @@ const isObjectEmty = (object: any) => {
 
 export default function BoardContent() {
   const [board, setBoard] = useState<Board>({
-    id: "",
+    _id: "",
     columnOrder: [],
-    columns: []
+    columns: [],
+    title: ''
   });
   const [columns, setColumns] = useState<TrelloColumn[]>([]);
   const [newColumnForm, setNewColumnForm] = useState(false);
@@ -32,16 +33,15 @@ export default function BoardContent() {
   const onNewColumnTitleChanged = (element: React.ChangeEvent<FormControlElement>) => { setNewColumnTitle(element.target.value)/*; console.log(element);*/ };
 
   useEffect(() => {
-    const boardFromDB = initialData.boards.find(board => board.id === 'board-1');
-    if (boardFromDB) {
-      setBoard(boardFromDB);
-
-      boardFromDB.columns.sort(function (a, b) {
-        return boardFromDB.columnOrder.indexOf(a.id) - boardFromDB.columnOrder.indexOf(b.id);
+    fetchBoard('644b436873072813fe581a33').then(board => {
+      setBoard(board);
+  
+      board.columns.sort(function (a, b) {
+        return board.columnOrder.indexOf(a._id) - board.columnOrder.indexOf(b._id);
       });
-
-      setColumns(boardFromDB.columns);
-    }
+  
+      setColumns(board.columns);
+    })
   }, [])
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function BoardContent() {
 
   const updateBoard = (newColumns: TrelloColumn[]) => {
     let newBoard = { ...board };
-    newBoard.columnOrder = newColumns.map(col => col.id);
+    newBoard.columnOrder = newColumns.map(col => col._id);
     newBoard.columns = newColumns;
     setColumns(newColumns);
     setBoard(newBoard);
@@ -73,9 +73,9 @@ export default function BoardContent() {
       let newColumns = [...columns];
       // exclamation point to explicitly say the result of Array.find()
       // in this case never return undefined
-      let currentColumn = newColumns.find(col => col.id === columnId)!;
+      let currentColumn = newColumns.find(col => col._id === columnId)!;
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult);
-      currentColumn.cardOrder = currentColumn.cards.map(card => card.id);
+      currentColumn.cardOrder = currentColumn.cards.map(card => card._id);
       setColumns(newColumns);
     }
   }
@@ -89,8 +89,8 @@ export default function BoardContent() {
     }
 
     const newColumnToAdd: TrelloColumn = {
-      id: Math.random().toString(36).substring(2, 5),
-      boardId: board.id,
+      _id: Math.random().toString(36).substring(2, 5),
+      boardId: board._id,
       title: newColumnTitle.trim(),
       cardOrder: [],
       cards: []
@@ -104,8 +104,8 @@ export default function BoardContent() {
 
   const onUpdateColumn = (newColumnToUpdate: TrelloColumn) => {
     let newColumns = [...columns];
-    const indexOfColumnToUpdate = newColumns.findIndex(col => col.id === newColumnToUpdate.id);
-    newColumnToUpdate._destroyed ?
+    const indexOfColumnToUpdate = newColumns.findIndex(col => col._id === newColumnToUpdate._id);
+    newColumnToUpdate._destroy ?
       newColumns.splice(indexOfColumnToUpdate, 1) :
       newColumns.splice(indexOfColumnToUpdate, 1, newColumnToUpdate);
 
