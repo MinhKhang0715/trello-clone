@@ -9,7 +9,7 @@ import './BoardContent.scss';
 import Column from "../Column/Column";
 import { Board, TrelloColumn, FormControlElement } from "../commons/Interfaces";
 import { applyDrag } from "../../helpers/dragDrop";
-import { fetchBoard } from "../../actions/ApiCall";
+import { fetchBoard, createNewColumn } from "../../actions/ApiCall";
 
 const isObjectEmty = (object: any) => {
   return (
@@ -88,21 +88,21 @@ export default function BoardContent() {
       return;
     }
 
-    const newColumnToAdd: TrelloColumn = {
-      _id: Math.random().toString(36).substring(2, 5),
+    const newColumnToAdd: any = {
       boardId: board._id,
       title: newColumnTitle.trim(),
-      cardOrder: [],
-      cards: []
     }
-    let newColumns = [...columns];
-    newColumns.push(newColumnToAdd);
-    updateBoard(newColumns);
-    setNewColumnTitle('');
-    toggleOpenNewColumnForm();
+    // call api
+    createNewColumn(newColumnToAdd).then(newCol => {
+      let newColumns = [...columns];
+      newColumns.push(newCol);
+      updateBoard(newColumns);
+      setNewColumnTitle('');
+      toggleOpenNewColumnForm();
+    })
   }
 
-  const onUpdateColumn = (newColumnToUpdate: TrelloColumn) => {
+  const onUpdateColumnState = (newColumnToUpdate: TrelloColumn) => {
     let newColumns = [...columns];
     const indexOfColumnToUpdate = newColumns.findIndex(col => col._id === newColumnToUpdate._id);
     newColumnToUpdate._destroy ?
@@ -129,7 +129,7 @@ export default function BoardContent() {
             <Column
               column={column}
               onCardDrop={onCardDrop}
-              onUpdateColumn={onUpdateColumn}
+              onUpdateColumnState={onUpdateColumnState}
             />
           </Draggable>
         ))}

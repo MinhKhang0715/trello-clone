@@ -5,18 +5,19 @@ import { Dropdown, Form, Button } from "react-bootstrap";
 
 import Card from "../Card/Card";
 import ConfirmModal from "../commons/ConfirmModal";
-import { TrelloColumn, FormControlElement, TrelloCard } from "../commons/Interfaces";
+import { TrelloColumn, FormControlElement } from "../commons/Interfaces";
 import { /*MODAL_ACTION_CLOSE,*/ MODAL_ACTION_CONFIRM } from "../../helpers/constants";
 import { saveContentAfterEnter, selectAllInlineText } from "../../helpers/contentEditable";
+import { createNewCard, updateColumn } from "../../actions/ApiCall";
 
 interface ComponentProps {
   column: TrelloColumn;
   onCardDrop(columnId: string, dropResult: DropResult): void;
-  onUpdateColumn(newColumnToUpdate: TrelloColumn): void;
+  onUpdateColumnState(newColumnToUpdate: TrelloColumn): void;
 }
 
 export default function Column(props: ComponentProps) {
-  const { column, onCardDrop, onUpdateColumn  } = props;
+  const { column, onCardDrop, onUpdateColumnState } = props;
   const cards = column.cards.sort(function (a, b) {
     return column.cardOrder.indexOf(a._id) - column.cardOrder.indexOf(b._id);
   });
@@ -44,24 +45,35 @@ export default function Column(props: ComponentProps) {
 
   const toggleShowModal = () => setShowModal(!showModal);
 
+  // remove column
   const onConfirmModal = (type: any) => {
     if (type === MODAL_ACTION_CONFIRM) {
-      // remove column
       const newColumn = {
         ...column,
-        _destroyed: true
+        _destroy: true
       };
-      onUpdateColumn(newColumn);
+      // call updateColumn api
+      updateColumn(newColumn._id, newColumn).then(updatedCol => {
+        updatedCol.cards = newColumn.cards;
+        onUpdateColumnState(updatedCol);
+      });
     }
     toggleShowModal();
   }
 
+  // update column title
   const handleColumnTitleBlur = () => {
-    const newColumn = {
-      ...column,
-      title: columnTitle
-    };
-    onUpdateColumn(newColumn);
+    if (columnTitle !== column.title) {
+      const newColumn = {
+        ...column,
+        title: columnTitle
+      };
+      // call updateColumn api
+      updateColumn(newColumn._id, newColumn).then(updatedCol => {
+        updatedCol.cards = newColumn.cards;
+        onUpdateColumnState(updatedCol);
+      });
+    }
   }
 
   const addNewCard = () => {
@@ -70,20 +82,21 @@ export default function Column(props: ComponentProps) {
       return;
     }
 
-    const newCardToAdd: TrelloCard = {
-      _id: Math.random().toString(36).substring(2, 5),
+    const newCardToAdd: any = {
       boardId: column.boardId,
       columnId: column._id,
-      title: newCardTitle.trim(),
-      cover: null
+      title: newCardTitle.trim()
     };
-    // don't use spread operator because it will modify the original
-    let newColumn = JSON.parse(JSON.stringify(column));
-    newColumn.cards.push(newCardToAdd);
-    newColumn.cardOrder.push(newCardToAdd._id);
-    onUpdateColumn(newColumn);
-    setNewCardTitle('');
-    toggleOpenNewCardArea();
+    // call api
+    createNewCard(newCardToAdd).then(newCard => {
+      // don't use spread operator because it will modify the original
+      let newColumn = JSON.parse(JSON.stringify(column));
+      newColumn.cards.push(newCard);
+      newColumn.cardOrder.push(newCard._id);
+      onUpdateColumnState(newColumn);
+      setNewCardTitle('');
+      toggleOpenNewCardArea();
+    })
   }
 
   return (
