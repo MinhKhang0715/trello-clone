@@ -8,7 +8,7 @@ import ConfirmModal from "../commons/ConfirmModal";
 import { TrelloColumn, FormControlElement } from "../commons/Interfaces";
 import { /*MODAL_ACTION_CLOSE,*/ MODAL_ACTION_CONFIRM } from "../../helpers/constants";
 import { saveContentAfterEnter, selectAllInlineText } from "../../helpers/contentEditable";
-import { createNewCard, updateColumn } from "../../actions/ApiCall";
+import { apiCalls } from "../../actions/ApiCall";
 
 interface ComponentProps {
   column: TrelloColumn;
@@ -53,7 +53,7 @@ export default function Column(props: ComponentProps) {
         _destroy: true
       };
       // call updateColumn api
-      updateColumn(newColumn._id, newColumn).then(updatedCol => {
+      apiCalls.updateColumn(newColumn._id, newColumn).then(updatedCol => {
         updatedCol.cards = newColumn.cards;
         onUpdateColumnState(updatedCol);
       });
@@ -69,7 +69,7 @@ export default function Column(props: ComponentProps) {
         title: columnTitle
       };
       // call updateColumn api
-      updateColumn(newColumn._id, newColumn).then(updatedCol => {
+      apiCalls.updateColumn(newColumn._id, newColumn).then(updatedCol => {
         updatedCol.cards = newColumn.cards;
         onUpdateColumnState(updatedCol);
       });
@@ -88,7 +88,7 @@ export default function Column(props: ComponentProps) {
       title: newCardTitle.trim()
     };
     // call api
-    createNewCard(newCardToAdd).then(newCard => {
+    apiCalls.createNewCard(newCardToAdd).then(newCard => {
       // don't use spread operator because it will modify the original
       let newColumn = JSON.parse(JSON.stringify(column));
       newColumn.cards.push(newCard);

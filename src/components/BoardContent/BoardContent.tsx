@@ -9,7 +9,7 @@ import './BoardContent.scss';
 import Column from "../Column/Column";
 import { Board, TrelloColumn, FormControlElement, TrelloCard } from "../commons/Interfaces";
 import { applyDrag } from "../../helpers/dragDrop";
-import { fetchBoard, createNewColumn, updateBoard, updateColumn, updateCard } from "../../actions/ApiCall";
+import { apiCalls } from "../../actions/ApiCall";
 
 const isObjectEmty = (object: any) => {
   return (
@@ -37,13 +37,13 @@ export default function BoardContent() {
   const onNewColumnTitleChanged = (element: React.ChangeEvent<FormControlElement>) => { setNewColumnTitle(element.target.value)/*; console.log(element);*/ };
 
   useEffect(() => {
-    fetchBoard('644b436873072813fe581a33').then(board => {
+    apiCalls.fetchBoard('644b436873072813fe581a33').then(board => {
       setBoard(board);
-  
+
       board.columns.sort(function (a, b) {
         return board.columnOrder.indexOf(a._id) - board.columnOrder.indexOf(b._id);
       });
-  
+
       setColumns(board.columns);
     })
   }, [])
@@ -76,8 +76,8 @@ export default function BoardContent() {
     newBoard.columns = newColumns;
     setColumns(newColumns);
     setBoard(newBoard);
-    updateBoard(newBoard._id, newBoard).then(updatedBoard => {
-      
+    apiCalls.updateBoard(newBoard._id, newBoard).then(updatedBoard => {
+
     }).catch(error => {
       console.log(error.message);
       setColumns(columns);
@@ -97,15 +97,15 @@ export default function BoardContent() {
       if (dropResult.removedIndex !== null && dropResult.addedIndex !== null) {
         // card moved within a column
         // update cardOrder in the current column
-        updateColumn(currentColumn._id, currentColumn).catch(() => setColumns(columns));
+        apiCalls.updateColumn(currentColumn._id, currentColumn).catch(() => setColumns(columns));
       } else {
         // card moved from column to another column
         // update columnId in the card, then update the cardOrder in both the origin column and the targeted column
-        updateColumn(currentColumn._id, currentColumn).catch(() => setColumns(columns));
+        apiCalls.updateColumn(currentColumn._id, currentColumn).catch(() => setColumns(columns));
         if (dropResult.addedIndex !== null) {
           let currentCard = dropResult.payload as TrelloCard;
           currentCard.columnId = currentColumn._id;
-          updateCard(currentCard._id, currentCard);
+          apiCalls.updateCard(currentCard._id, currentCard);
         }
       }
     }
@@ -124,7 +124,7 @@ export default function BoardContent() {
       title: newColumnTitle.trim(),
     }
     // call api
-    createNewColumn(newColumnToAdd).then(newCol => {
+    apiCalls.createNewColumn(newColumnToAdd).then(newCol => {
       let newColumns = [...columns];
       newColumns.push(newCol);
       updateBoardContent(newColumns);
